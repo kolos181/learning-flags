@@ -1,10 +1,11 @@
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>World Flag Challenge - 6 Choices</title>
+  <title>World Flag Challenge - 4 Choices</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Canvas Confetti CDN -->
@@ -54,7 +55,7 @@
         </div>
         <div>
           <h1 class="text-lg font-bold tracking-tight text-white leading-tight">FlagMaster</h1>
-          <p class="text-xs text-slate-400 font-medium">6-Choice Flag Identifier</p>
+          <p class="text-xs text-slate-400 font-medium">4-Choice Flag Identifier</p>
         </div>
       </div>
 
@@ -87,7 +88,7 @@
           How Well Do You Know <br><span class="bg-gradient-to-r from-sky-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">World Flags?</span>
         </h2>
         <p class="text-slate-400 max-w-md mx-auto text-sm sm:text-base">
-          Test your geography prowess with 6 challenging options per flag. Correct answers instantly advance to keep your momentum going!
+          Test your geography prowess with 4 challenging options per flag. Correct answers instantly advance to keep your momentum going!
         </p>
       </div>
 
@@ -227,9 +228,9 @@
         </div>
       </div>
 
-      <!-- 6 Choices Grid -->
+      <!-- 4 Choices Grid -->
       <div id="choicesGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-        <!-- 6 Buttons will be populated via JS -->
+        <!-- 4 Buttons will be populated via JS -->
       </div>
 
       <!-- Next Action Control -->
@@ -297,7 +298,7 @@
 
   <!-- Footer -->
   <footer class="border-t border-slate-800 text-center py-4 text-xs text-slate-500">
-    FlagMaster • Test your world flag knowledge with 6 choices • Flags powered by official ISO vectors
+    FlagMaster • Test your world flag knowledge with 4 choices • Flags powered by official ISO vectors
   </footer>
 
   <script>
@@ -323,4 +324,575 @@
       { code: "ie", name: "Ireland", continent: "Europe", fact: "The green represents Gaelic traditions, orange represents William of Orange's supporters, and white symbolizes peace between them." },
       { code: "gr", name: "Greece", continent: "Europe", fact: "The nine horizontal stripes represent the nine syllables of the motto 'Eleftheria i Thanatos' (Freedom or Death)." },
       { code: "pl", name: "Poland", continent: "Europe", fact: "White and red have been Poland's national colors since the 13th-century Royal Coat of Arms." },
-      { code: "ua", name: "Ukraine", continent: "Europe", fact: "The vivid blue represents peacefu
+      { code: "ua", name: "Ukraine", continent: "Europe", fact: "The vivid blue represents peaceful skies above endless golden wheat fields." },
+      { code: "at", name: "Austria", continent: "Europe", fact: "Legend says Duke Leopold V's white tunic was drenched in blood after battle, leaving a white stripe where his belt was." },
+      { code: "cz", name: "Czech Republic", continent: "Europe", fact: "Added a blue triangle at the hoist to distinguish itself from the historic flag of Poland." },
+      { code: "ro", name: "Romania", continent: "Europe", fact: "Virtually identical to the flag of Chad, differing only slightly in the shade of blue." },
+      { code: "hr", name: "Croatia", continent: "Europe", fact: "Prominently displays the historic red-and-white checkerboard shield (šahovnica) in its center." },
+      { code: "mc", name: "Monaco", continent: "Europe", fact: "Sharing red and white horizontal stripes with Indonesia, differing primarily in proportion and origin." },
+      { code: "va", name: "Vatican City", continent: "Europe", fact: "One of only two square national flags; displays the crossed keys of Saint Peter and the papal tiara." },
+
+      // Asia
+      { code: "jp", name: "Japan", continent: "Asia", fact: "Known as Nisshōki (the sun-mark flag); the crimson disc represents the goddess Amaterasu and the rising sun." },
+      { code: "kr", name: "South Korea", continent: "Asia", fact: "The Taegeuk represents balance (Yin and Yang), surrounded by four black trigrams symbolizing fundamental elements." },
+      { code: "cn", name: "China", continent: "Asia", fact: "The large star represents the Communist Party, and the four smaller stars symbolize the social classes united under it." },
+      { code: "in", name: "India", continent: "Asia", fact: "Features the Ashoka Chakra, a 24-spoke navy blue wheel representing the eternal wheel of law and duty (Dharma)." },
+      { code: "id", name: "Indonesia", continent: "Asia", fact: "Colors date back to the 13th-century banner of the Majapahit Empire." },
+      { code: "th", name: "Thailand", continent: "Asia", fact: "Known as the Trairanga (tricolor); adopted in 1917 to show solidarity with the Allies in World War I." },
+      { code: "vn", name: "Vietnam", continent: "Asia", fact: "The central five-pointed gold star represents workers, peasants, soldiers, intellectuals, and entrepreneurs." },
+      { code: "ph", name: "Philippines", continent: "Asia", fact: "Unique in that it is flown with the red stripe on top during times of war and blue on top during peace." },
+      { code: "my", name: "Malaysia", continent: "Asia", fact: "Known as Jalur Gemilang (Stripes of Glory), featuring 14 alternating stripes and a 14-point star." },
+      { code: "sg", name: "Singapore", continent: "Asia", fact: "The crescent moon represents a rising young nation, and the five stars represent democracy, peace, progress, justice, and equality." },
+      { code: "np", name: "Nepal", continent: "Asia", fact: "The only non-quadrilateral national flag in the world, formed by two pennants representing the Himalayan mountains." },
+      { code: "bt", name: "Bhutan", continent: "Asia", fact: "Features Druk, the Thunder Dragon, grasping jewels that signify national wealth and security." },
+      { code: "lk", name: "Sri Lanka", continent: "Asia", fact: "Known as the Lion Flag; the gold lion holds a kastane sword representing the bravery of the Sinhalese people." },
+      { code: "bd", name: "Bangladesh", continent: "Asia", fact: "The red disc is shifted slightly towards the hoist so it appears centered when fluttering in the breeze." },
+      { code: "sa", name: "Saudi Arabia", continent: "Asia", fact: "Displays the Islamic Shahada inscription and a sword; by law it is never hoisted at half-mast." },
+      { code: "ae", name: "United Arab Emirates", continent: "Asia", fact: "Incorporates the four Pan-Arab colors: red, green, white, and black, representing Arab unity." },
+      { code: "qa", name: "Qatar", continent: "Asia", fact: "Has nine serrated white points representing Qatar as the 9th member of the 'reconciled Emirates' of the Arabian Gulf." },
+      { code: "il", name: "Israel", continent: "Asia", fact: "Features the Star of David centered between two horizontal blue stripes reminiscent of the tallit prayer shawl." },
+      { code: "tr", name: "Turkey", continent: "Asia", fact: "Legend says the crescent moon and star reflect in a pool of blood after the Battle of Kosovo in 1448." },
+      { code: "mn", name: "Mongolia", continent: "Asia", fact: "Features the Soyombo symbol, a geometric column representing fire, sun, moon, earth, water, and Taijitu." },
+      { code: "kz", name: "Kazakhstan", continent: "Asia", fact: "A steppe eagle flies beneath a 32-rayed golden sun against a sky-blue background symbolizing Tengri." },
+      { code: "ir", name: "Iran", continent: "Asia", fact: "The edge of the green and red stripes features the phrase 'Allahu Akbar' repeated 22 times in Kufic script." },
+      { code: "lb", name: "Lebanon", continent: "Asia", fact: "Features a green Lebanon cedar tree, an ancient biblical emblem of holiness, eternity, and peace." },
+
+      // Americas
+      { code: "us", name: "United States", continent: "Americas", fact: "Designed with 50 stars representing the 50 states and 13 stripes honoring the original colonies." },
+      { code: "ca", name: "Canada", continent: "Americas", fact: "The iconic 11-pointed stylized maple leaf was officially inaugurated on February 15, 1965." },
+      { code: "mx", name: "Mexico", continent: "Americas", fact: "Depicts an Aztec legend: an eagle perched on a prickly pear cactus devouring a rattlesnake." },
+      { code: "br", name: "Brazil", continent: "Americas", fact: "The celestial globe shows constellations as seen from Rio de Janeiro on November 15, 1889, inscribed with 'Ordem e Progresso'." },
+      { code: "ar", name: "Argentina", continent: "Americas", fact: "The central golden 'Sun of May' commemorates the radiant sun that broke through cloudy skies during the 1810 May Revolution." },
+      { code: "cl", name: "Chile", continent: "Americas", fact: "Known as La Estrella Solitaria (The Lone Star), guiding the path to progress and honor." },
+      { code: "co", name: "Colombia", continent: "Americas", fact: "The top yellow stripe is double the width of the blue and red stripes, representing golden mineral wealth." },
+      { code: "pe", name: "Peru", continent: "Americas", fact: "Designed by José de San Martín, who was allegedly inspired by seeing a flock of red-and-white parihuanas flamingos." },
+      { code: "cu", name: "Cuba", continent: "Americas", fact: "Designed in 1849 in New York City by exiled poet Miguel Teurbe Tolón and Narciso López." },
+      { code: "jm", name: "Jamaica", continent: "Americas", fact: "The only national flag in the world that does not contain the colors red, white, or blue." },
+      { code: "uy", name: "Uruguay", continent: "Americas", fact: "Features nine horizontal stripes representing the original nine departments and the Sun of May." },
+      { code: "ve", name: "Venezuela", continent: "Americas", fact: "Features an arc of eight white five-pointed stars representing the historic provinces." },
+      { code: "pa", name: "Panama", continent: "Americas", fact: "Its four quarters represent the Liberal and Conservative political parties, with white symbolizing peace between them." },
+      { code: "cr", name: "Costa Rica", continent: "Americas", fact: "Inspired by the French Tricolore when First Lady Pacífica Fernández created it in 1848." },
+      { code: "ec", name: "Ecuador", continent: "Americas", fact: "Shares the Miranda tricolor with Colombia and Venezuela, but displays its national coat of arms in the center." },
+      { code: "bb", name: "Barbados", continent: "Americas", fact: "Features the trident of the mythical sea god Neptune, with the broken shaft denoting breaking free from colonial rule." },
+      { code: "bs", name: "Bahamas", continent: "Americas", fact: "The black equilateral triangle represents the vigor and force of a united people pointing toward natural resources." },
+      { code: "tt", name: "Trinidad and Tobago", continent: "Americas", fact: "The black diagonal stripe bordered by white symbolizes dedication and the sea that embraces the twin islands." },
+
+      // Africa
+      { code: "za", name: "South Africa", continent: "Africa", fact: "Adopted in 1994 to celebrate the end of apartheid; the 'Y' design symbolizes the convergence of diverse paths into one." },
+      { code: "eg", name: "Egypt", continent: "Africa", fact: "Features the golden Eagle of Saladin in the center of the Arab Liberation tricolor." },
+      { code: "ng", name: "Nigeria", continent: "Africa", fact: "Designed by 23-year-old student Taiwo Akinkunmi in 1959; the green represents lush agriculture and white represents peace." },
+      { code: "ke", name: "Kenya", continent: "Africa", fact: "Displays a traditional Maasai shield and two crossed spears defending freedom." },
+      { code: "ma", name: "Morocco", continent: "Africa", fact: "Features a green pentagram (the Seal of Solomon) on a deep red field symbolizing the Alaouite dynasty." },
+      { code: "gh", name: "Ghana", continent: "Africa", fact: "First African nation to adopt the Pan-African red, gold, and green; the Black Star is a symbol of African emancipation." },
+      { code: "et", name: "Ethiopia", continent: "Africa", fact: "The historical source of the Pan-African colors (green, yellow, red); its central pentagram emits radiant rays of hope." },
+      { code: "sn", name: "Senegal", continent: "Africa", fact: "Features three vertical Pan-African stripes with a green five-pointed star in the golden center." },
+      { code: "tz", name: "Tanzania", continent: "Africa", fact: "Combines elements from the flags of Tanganyika and Zanzibar following their unification in 1964." },
+      { code: "tn", name: "Tunisia", continent: "Africa", fact: "Almost unchanged since 1827, making it one of the oldest flags in the Arab world." },
+      { code: "dz", name: "Algeria", continent: "Africa", fact: "The red star and crescent are traditional symbols of Islam, split across equal green and white halves." },
+      { code: "ug", name: "Uganda", continent: "Africa", fact: "In the center stands the Grey Crowned Crane, known for its gentle nature and regal military step." },
+      { code: "rw", name: "Rwanda", continent: "Africa", fact: "Adopted in 2001; features blue, yellow, and green with a golden sun bearing 24 rays to symbolize enlightenment." },
+      { code: "sc", name: "Seychelles", continent: "Africa", fact: "Five radiating colorful bands project obliquely from the bottom corner, representing a dynamic emerging country." },
+      { code: "mu", name: "Mauritius", continent: "Africa", fact: "Known as 'Les Quatre Bandes' (The Four Bands): red for independence, blue for the Indian Ocean, yellow for sunshine, green for vegetation." },
+      { code: "mz", name: "Mozambique", continent: "Africa", fact: "The only national flag in the world featuring a modern assault rifle (an AK-47) alongside a hoe and open book." },
+      { code: "cd", name: "DR Congo", continent: "Africa", fact: "The sky blue field signifies peace, the red diagonal stripe stands for martyrs' blood, and yellow represents wealth." },
+      { code: "cm", name: "Cameroon", continent: "Africa", fact: "The second African state to use Pan-African colors; dubbed the 'Star of Unity'." },
+
+      // Oceania
+      { code: "au", name: "Australia", continent: "Oceania", fact: "Features the Union Jack, the large Commonwealth Star, and the five stars of the Southern Cross constellation." },
+      { code: "nz", name: "New Zealand", continent: "Oceania", fact: "Features four red stars with white borders representing the Southern Cross constellation." },
+      { code: "fj", name: "Fiji", continent: "Oceania", fact: "A light cyan field carrying the Union Jack and a British-style shield depicting a British lion holding a cocoa pod." },
+      { code: "pg", name: "Papua New Guinea", continent: "Oceania", fact: "Designed by 15-year-old schoolgirl Susan Karike; portrays a golden Raggiana Bird of Paradise in flight." },
+      { code: "ws", name: "Samoa", continent: "Oceania", fact: "A red field with a blue canton bearing the Southern Cross constellation; red denotes courage and blue denotes freedom." },
+      { code: "to", name: "Tonga", continent: "Oceania", fact: "The red cross on a white canton in the upper left reflects the country's deep Christian heritage." },
+      { code: "vu", name: "Vanuatu", continent: "Oceania", fact: "Depicts a boar's tusk (symbolizing prosperity) and two crossed namele fern fronds indicating peace." },
+      { code: "pw", name: "Palau", continent: "Oceania", fact: "The golden disc represents the full moon, which the Palauan people consider the optimum time for fishing and planting." },
+      { code: "ki", name: "Kiribati", continent: "Oceania", fact: "Features a golden frigatebird soaring over a rising sun and three undulating white wave stripes." }
+    ];
+
+    /* ==========================================================================
+       APPLICATION STATE
+       ========================================================================== */
+    let currentMode = 'all'; // 'all' | 'classic' | 'timed' | 'survival' | 'repeat'
+    let selectedContinent = 'All';
+    let questionPool = [];
+    let currentQuestionIndex = 0;
+    let currentCountry = null;
+    let score = 0;
+    let streak = 0;
+    let bestStreak = 0;
+    let answered = false;
+    let sessionHistory = []; // { country, userAnswer, isCorrect }
+    let timerInterval = null;
+    let autoAdvanceTimer = null;
+    let timeRemaining = 60;
+    let repeatFlagCodes = new Set();
+
+    /* ==========================================================================
+       COOKIE STORAGE HELPERS FOR REPEAT (TBD) QUEUE
+       ========================================================================== */
+    function setCookie(name, value, days = 365) {
+      try {
+        const expires = new Date(Date.now() + days * 864e5).toUTCString();
+        document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+      } catch (err) {
+        // Fallback silently if cookies are blocked in sandboxed context
+      }
+    }
+
+    function getCookie(name) {
+      try {
+        const cookies = document.cookie ? document.cookie.split('; ') : [];
+        for (const item of cookies) {
+          const [key, val] = item.split('=');
+          if (decodeURIComponent(key) === name) {
+            return decodeURIComponent(val || '');
+          }
+        }
+      } catch (err) {
+        return null;
+      }
+      return null;
+    }
+
+    function loadRepeatListFromCookie() {
+      const raw = getCookie('flagmaster_repeat_list');
+      if (raw) {
+        try {
+          const codes = JSON.parse(raw);
+          if (Array.isArray(codes)) {
+            repeatFlagCodes = new Set(codes);
+          }
+        } catch (e) {
+          // If not JSON, try comma separated
+          repeatFlagCodes = new Set(raw.split(',').filter(Boolean));
+        }
+      }
+      updateRepeatBadges();
+    }
+
+    function saveRepeatListToCookie() {
+      const codesArray = Array.from(repeatFlagCodes);
+      setCookie('flagmaster_repeat_list', JSON.stringify(codesArray));
+      updateRepeatBadges();
+    }
+
+    function updateRepeatBadges() {
+      const count = repeatFlagCodes.size;
+      const headerCount = document.getElementById('headerRepeatCount');
+      if (headerCount) headerCount.textContent = count;
+      const cardBadge = document.getElementById('repeatCardBadge');
+      if (cardBadge) cardBadge.textContent = `${count} Flag${count === 1 ? '' : 's'}`;
+    }
+
+    function toggleCurrentFlagRepeat() {
+      if (!currentCountry) return;
+      toggleFlagRepeat(currentCountry.code);
+      updateMarkButtonState();
+    }
+
+    function toggleFlagRepeat(code) {
+      if (repeatFlagCodes.has(code)) {
+        repeatFlagCodes.delete(code);
+      } else {
+        repeatFlagCodes.add(code);
+      }
+      saveRepeatListToCookie();
+    }
+
+    function updateMarkButtonState() {
+      const btn = document.getElementById('markRepeatBtn');
+      const icon = document.getElementById('markRepeatIcon');
+      const text = document.getElementById('markRepeatText');
+      if (!btn || !currentCountry) return;
+
+      const isMarked = repeatFlagCodes.has(currentCountry.code);
+      if (isMarked) {
+        btn.className = "flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg border transition-all bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm shadow-amber-500/20";
+        icon.textContent = "📌";
+        text.textContent = "Marked for Repeat";
+      } else {
+        btn.className = "flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg border transition-all text-slate-400 border-slate-700 hover:border-amber-400 hover:text-amber-300";
+        icon.textContent = "🔖";
+        text.textContent = "Repeat Later";
+      }
+    }
+
+    /* ==========================================================================
+       INITIALIZATION & NAVIGATION
+       ========================================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      loadRepeatListFromCookie();
+      document.getElementById('bestStreakBadge').textContent = bestStreak;
+      document.getElementById('continentFilter').addEventListener('change', (e) => {
+        selectedContinent = e.target.value;
+      });
+    });
+
+    function showHomeScreen() {
+      clearInterval(timerInterval);
+      clearTimeout(autoAdvanceTimer);
+      updateRepeatBadges();
+      document.getElementById('startScreen').classList.remove('hidden');
+      document.getElementById('quizScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.add('hidden');
+    }
+
+    /* ==========================================================================
+       GAME ENGINE & GENERATOR (6 CHOICES LOGIC)
+       ========================================================================== */
+    function startGame(mode) {
+      if (mode === 'repeat') {
+        const markedCountries = COUNTRIES.filter(c => repeatFlagCodes.has(c.code));
+        if (markedCountries.length === 0) {
+          const card = document.getElementById('repeatModeCard');
+          if (card) {
+            card.classList.add('ring-2', 'ring-amber-400');
+            setTimeout(() => card.classList.remove('ring-2', 'ring-amber-400'), 800);
+          }
+          return;
+        }
+      }
+
+      currentMode = mode;
+      score = 0;
+      streak = 0;
+      currentQuestionIndex = 0;
+      sessionHistory = [];
+      clearInterval(timerInterval);
+      clearTimeout(autoAdvanceTimer);
+
+      if (currentMode === 'repeat') {
+        // Pool exclusively contains the marked repeat flags
+        questionPool = shuffleArray(COUNTRIES.filter(c => repeatFlagCodes.has(c.code)));
+      } else {
+        // Filter available countries based on continent selection
+        let pool = COUNTRIES;
+        if (selectedContinent !== 'All') {
+          pool = COUNTRIES.filter(c => c.continent === selectedContinent);
+        }
+
+        if (pool.length < 4) {
+          pool = COUNTRIES;
+        }
+        questionPool = shuffleArray([...pool]);
+      }
+
+      document.getElementById('currentScore').textContent = '0';
+      document.getElementById('currentStreak').textContent = '0';
+      document.getElementById('streakBadge').textContent = '0';
+
+      const timerEl = document.getElementById('timerDisplay');
+      if (currentMode === 'timed') {
+        timeRemaining = 60;
+        timerEl.classList.remove('hidden');
+        timerEl.textContent = `⏱️ ${timeRemaining}s`;
+        startTimer();
+      } else {
+        timerEl.classList.add('hidden');
+      }
+
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.add('hidden');
+      document.getElementById('quizScreen').classList.remove('hidden');
+
+      loadNextQuestion();
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        const timerEl = document.getElementById('timerDisplay');
+        timerEl.textContent = `⏱️ ${timeRemaining}s`;
+        if (timeRemaining <= 10) {
+          timerEl.classList.add('animate-pulse', 'text-rose-400');
+        }
+        if (timeRemaining <= 0) {
+          clearInterval(timerInterval);
+          finishGame();
+        }
+      }, 1000);
+    }
+
+    function loadNextQuestion() {
+      clearTimeout(autoAdvanceTimer);
+      answered = false;
+      document.getElementById('factBox').classList.add('hidden');
+      document.getElementById('actionRow').classList.add('hidden');
+
+      // Check termination conditions
+      if (currentMode === 'classic' && currentQuestionIndex >= 15) {
+        finishGame();
+        return;
+      }
+      if (currentMode === 'all' && currentQuestionIndex >= questionPool.length) {
+        finishGame();
+        return;
+      }
+
+      // If pool runs out in infinite modes, reshuffle
+      if (currentQuestionIndex >= questionPool.length) {
+        questionPool = shuffleArray([...COUNTRIES]);
+        currentQuestionIndex = 0;
+      }
+
+      currentCountry = questionPool[currentQuestionIndex];
+
+      // Update progress and header info
+      let totalDisplay = '∞';
+      let progressPct = 100;
+      if (currentMode === 'classic') {
+        totalDisplay = '15';
+        progressPct = ((currentQuestionIndex) / 15) * 100;
+      } else if (currentMode === 'all' || currentMode === 'repeat') {
+        totalDisplay = questionPool.length;
+        progressPct = ((currentQuestionIndex) / questionPool.length) * 100;
+      }
+
+      document.getElementById('progressIndicator').textContent = `Question ${currentQuestionIndex + 1} / ${totalDisplay}`;
+      document.getElementById('progressBar').style.width = `${progressPct}%`;
+      document.getElementById('regionBadge').textContent = currentCountry.continent;
+      updateMarkButtonState();
+
+      // Load Flag Image
+      const flagImg = document.getElementById('flagImg');
+      const flagLoader = document.getElementById('flagLoader');
+      flagLoader.classList.remove('hidden');
+      flagImg.classList.add('opacity-0');
+      
+      // Use FlagCDN high-res PNG
+      flagImg.src = `https://flagcdn.com/w640/${currentCountry.code}.png`;
+
+      // Generate 4 Smart Choices (1 correct + 3 unique distractors)
+      const choices = generateFourChoices(currentCountry);
+
+      // Render 4 Choice Buttons
+      const choicesGrid = document.getElementById('choicesGrid');
+      choicesGrid.innerHTML = '';
+
+      choices.forEach((country, index) => {
+        const btn = document.createElement('button');
+        btn.className = `choice-btn w-full p-3.5 sm:p-4 rounded-xl bg-slate-800/90 hover:bg-slate-700/80 border border-slate-700/80 text-left font-semibold text-slate-200 text-sm sm:text-base flex items-center justify-between shadow-sm`;
+        btn.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-6 h-6 rounded-lg bg-slate-700/70 text-slate-400 text-xs flex items-center justify-center font-bold">
+              ${String.fromCharCode(65 + index)}
+            </span>
+            <span class="truncate">${country.name}</span>
+          </div>
+          <span class="choice-icon text-base"></span>
+        `;
+        btn.onclick = () => handleChoice(country, btn);
+        choicesGrid.appendChild(btn);
+      });
+    }
+
+    function flagLoaded() {
+      const flagImg = document.getElementById('flagImg');
+      const flagLoader = document.getElementById('flagLoader');
+      flagLoader.classList.add('hidden');
+      flagImg.classList.remove('opacity-0');
+      flagImg.classList.add('transition-opacity', 'duration-300');
+    }
+
+    function flagLoadFallback() {
+      const flagImg = document.getElementById('flagImg');
+      if (!flagImg.src.endsWith('.svg')) {
+        flagImg.src = `https://flagcdn.com/${currentCountry.code}.svg`;
+      }
+    }
+
+    /* ==========================================================================
+       CHOICE SELECTION LOGIC (PRIORITIZE SAME CONTINENT DISTRACTORS)
+       ========================================================================== */
+    function generateFourChoices(target) {
+      const options = [target];
+
+      // 1. Gather other countries from the same continent first for realistic difficulty
+      let continentPeers = COUNTRIES.filter(c => c.continent === target.continent && c.code !== target.code);
+      continentPeers = shuffleArray(continentPeers);
+
+      while (options.length < 3 && continentPeers.length > 0) {
+        options.push(continentPeers.pop());
+      }
+
+      // 2. Fill remaining slots from the general pool
+      let otherPool = COUNTRIES.filter(c => !options.some(opt => opt.code === c.code));
+      otherPool = shuffleArray(otherPool);
+
+      while (options.length < 4 && otherPool.length > 0) {
+        options.push(otherPool.pop());
+      }
+
+      return shuffleArray(options);
+    }
+
+    function handleChoice(selectedCountry, buttonEl) {
+      if (answered) return;
+      answered = true;
+
+      const isCorrect = (selectedCountry.code === currentCountry.code);
+      sessionHistory.push({
+        country: currentCountry,
+        selected: selectedCountry,
+        isCorrect: isCorrect
+      });
+
+      // Disable all choice buttons & highlight results
+      const allButtons = document.querySelectorAll('.choice-btn');
+      allButtons.forEach(btn => {
+        btn.disabled = true;
+        btn.classList.remove('hover:bg-slate-700/80');
+        const countryName = btn.querySelector('.truncate').textContent.trim();
+
+        if (countryName === currentCountry.name) {
+          // Correct button highlight
+          btn.classList.add('bg-emerald-600/30', 'border-emerald-500', 'text-emerald-300', 'pulse-animation');
+          btn.querySelector('.choice-icon').textContent = '✅';
+        } else if (btn === buttonEl && !isCorrect) {
+          // Incorrectly clicked button
+          btn.classList.add('bg-rose-600/30', 'border-rose-500', 'text-rose-300');
+          btn.querySelector('.choice-icon').textContent = '❌';
+        } else {
+          btn.classList.add('opacity-40');
+        }
+      });
+
+      // Update Scores & Streaks
+      if (isCorrect) {
+        score++;
+        streak++;
+        if (streak > bestStreak) {
+          bestStreak = streak;
+          document.getElementById('bestStreakBadge').textContent = bestStreak;
+        }
+
+        // Quick confirmation (500ms), then instantly advance to next question
+        autoAdvanceTimer = setTimeout(() => {
+          nextQuestion();
+        }, 500);
+      } else {
+        streak = 0;
+
+        // Show did you know fact & explicit Continue button on wrong answers
+        const factBox = document.getElementById('factBox');
+        const factText = document.getElementById('factText');
+        factText.innerHTML = `<strong>${currentCountry.name}:</strong> ${currentCountry.fact}`;
+        factBox.classList.remove('hidden');
+
+        // Handle Survival Mode fail condition
+        if (currentMode === 'survival') {
+          setTimeout(() => {
+            finishGame();
+          }, 1100);
+          return;
+        }
+
+        document.getElementById('actionRow').classList.remove('hidden');
+      }
+
+      // Update counters
+      document.getElementById('currentScore').textContent = score;
+      document.getElementById('currentStreak').textContent = streak;
+      document.getElementById('streakBadge').textContent = streak;
+    }
+
+    function nextQuestion() {
+      currentQuestionIndex++;
+      loadNextQuestion();
+    }
+
+    /* ==========================================================================
+       GAME OVER & RESULTS
+       ========================================================================== */
+    function finishGame() {
+      clearInterval(timerInterval);
+      clearTimeout(autoAdvanceTimer);
+      document.getElementById('quizScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.remove('hidden');
+
+      const totalPlayed = sessionHistory.length;
+      const accuracy = totalPlayed > 0 ? Math.round((score / totalPlayed) * 100) : 0;
+
+      document.getElementById('finalScore').textContent = score;
+      document.getElementById('finalAccuracy').textContent = `${accuracy}%`;
+      document.getElementById('finalStreak').textContent = `${bestStreak} 🔥`;
+      document.getElementById('finalQuestions').textContent = totalPlayed;
+
+      // Title & messaging
+      const resultTitle = document.getElementById('resultTitle');
+      const resultIcon = document.getElementById('resultIcon');
+      if (accuracy >= 85 && totalPlayed >= 10) {
+        resultTitle.textContent = "Vexillologist Supreme! 🌟";
+        resultIcon.textContent = "👑";
+        triggerConfetti();
+      } else if (accuracy >= 50) {
+        resultTitle.textContent = "Great Geographic Eye! 🧭";
+        resultIcon.textContent = "🎉";
+      } else {
+        resultTitle.textContent = "Keep Practicing! 📚";
+        resultIcon.textContent = "🗺️";
+      }
+
+      // Build Review List
+      const reviewList = document.getElementById('reviewList');
+      reviewList.innerHTML = '';
+
+      sessionHistory.forEach(item => {
+        const isMarked = repeatFlagCodes.has(item.country.code);
+        const row = document.createElement('div');
+        row.className = `p-2.5 rounded-lg border ${item.isCorrect ? 'bg-emerald-950/20 border-emerald-800/40 text-emerald-300' : 'bg-rose-950/20 border-rose-800/40 text-rose-300'} flex items-center justify-between text-xs`;
+        row.innerHTML = `
+          <div class="flex items-center gap-3">
+            <img src="https://flagcdn.com/w40/${item.country.code}.png" class="w-7 h-5 object-cover rounded shadow-sm" alt="flag">
+            <div>
+              <div class="font-bold text-slate-100">${item.country.name}</div>
+              <div class="text-[11px] text-slate-400">${item.isCorrect ? 'Correctly guessed' : `Guessed: ${item.selected.name}`}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="toggleReviewRepeat('${item.country.code}', this)" class="px-2 py-1 rounded text-[11px] font-semibold border ${isMarked ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-amber-300'}">
+              ${isMarked ? '📌 In Repeat' : '🔖 Repeat'}
+            </button>
+            <span class="font-bold text-sm w-4 text-center">${item.isCorrect ? '✓' : '✗'}</span>
+          </div>
+        `;
+        reviewList.appendChild(row);
+      });
+    }
+
+    function toggleReviewRepeat(code, btn) {
+      toggleFlagRepeat(code);
+      const isMarked = repeatFlagCodes.has(code);
+      btn.className = `px-2 py-1 rounded text-[11px] font-semibold border ${isMarked ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-amber-300'}`;
+      btn.textContent = isMarked ? '📌 In Repeat' : '🔖 Repeat';
+    }
+
+    function restartCurrentGame() {
+      startGame(currentMode);
+    }
+
+    /* ==========================================================================
+       UTILITY HELPERS
+       ========================================================================== */
+    function shuffleArray(arr) {
+      const array = [...arr];
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
+    }
+  </script>
+</body>
+</html>
+```
