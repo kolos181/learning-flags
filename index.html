@@ -115,9 +115,9 @@
               <h3 class="font-bold text-white text-base">Repeat Queue (TBD)</h3>
               <span id="repeatCardBadge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">0 Flags</span>
             </div>
-            <p class="text-xs text-slate-400 mt-1">Focused practice on flags you marked to repeat until mastered.</p>
+            <p class="text-xs text-slate-400 mt-1">Focused recall: type country names with smart autocomplete to test mastery.</p>
           </div>
-          <span class="mt-4 text-xs font-semibold text-amber-400 flex items-center gap-1">Start Repeat Review &rarr;</span>
+          <span class="mt-4 text-xs font-semibold text-amber-400 flex items-center gap-1">Start Repeat Typing &rarr;</span>
         </button>
 
         <!-- Standard Mode -->
@@ -227,9 +227,31 @@
         </div>
       </div>
 
-      <!-- 4 Choices Grid -->
+      <!-- 4 Choices Grid (Used for Classic, All Flags, Timed & Survival) -->
       <div id="choicesGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         <!-- 4 Buttons will be populated via JS -->
+      </div>
+
+      <!-- Type-in Autocomplete Form (Used specifically for Repeat Queue Mode) -->
+      <div id="typeInContainer" class="hidden space-y-2 relative">
+        <label for="countryInput" class="block text-xs font-semibold text-amber-400 uppercase tracking-wider flex items-center justify-between">
+          <span>⌨️ Type Country Name (Select or press Enter)</span>
+          <span class="text-slate-400 text-[11px] font-normal lowercase">arrow keys &uarr;&darr; to navigate</span>
+        </label>
+        <div class="relative">
+          <input 
+            type="text" 
+            id="countryInput" 
+            autocomplete="off" 
+            spellcheck="false"
+            placeholder="Start typing country name (e.g. Sweden, Brazil...)" 
+            class="w-full bg-slate-800 border-2 border-slate-700 focus:border-amber-400 rounded-xl px-4 py-3.5 text-white placeholder-slate-500 font-medium focus:outline-none transition-all shadow-inner text-base"
+          />
+          <div id="typeInputStatus" class="hidden absolute right-3.5 top-1/2 -translate-y-1/2 text-lg"></div>
+        </div>
+        <!-- Autocomplete Suggestions Dropdown -->
+        <div id="suggestionsList" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-slate-800/95 backdrop-blur-md border border-slate-700 rounded-xl max-h-56 overflow-y-auto shadow-2xl z-30 divide-y divide-slate-700/60">
+        </div>
       </div>
 
       <!-- Next Action Control -->
@@ -530,6 +552,8 @@
     let autoAdvanceTimer = null;
     let timeRemaining = 60;
     let repeatFlagCodes = new Set();
+    let highlightedSuggestionIndex = -1;
+    let currentSuggestions = [];
 
     /* ==========================================================================
        COOKIE STORAGE HELPERS FOR REPEAT (TBD) QUEUE
@@ -630,6 +654,7 @@
       document.getElementById('continentFilter').addEventListener('change', (e) => {
         selectedContinent = e.target.value;
       });
+      initTypeaheadEvents();
     });
 
     function showHomeScreen() {
@@ -766,6 +791,23 @@
       // Use FlagCDN high-res PNG
       flagImg.src = `https://flagcdn.com/w640/${currentCountry.code}.png`;
 
+      const choicesGrid = document.getElementById('choicesGrid');
+      const typeInContainer = document.getElementById('typeInContainer');
+
+      if (currentMode === 'repeat') {
+        // Hide 4-choice buttons and enable typing input
+        choicesGrid.classList.add('hidden');
+        typeInContainer.classList.remove('hidden');
+        resetTypeInput();
+      } else {
+        // Standard 4-choice mode
+        typeInContainer.classList.add('hidden');
+        choicesGrid.classList.remove('hidden');
+        setupMultipleChoice();
+      }
+    }
+
+    function setupMultipleChoice() {
       // Generate 4 Smart Choices (1 correct + 3 unique distractors)
       const choices = generateFourChoices(currentCountry);
 
@@ -788,6 +830,192 @@
         btn.onclick = () => handleChoice(country, btn);
         choicesGrid.appendChild(btn);
       });
+    }
+
+    /* ==========================================================================
+       TYPEAHEAD / AUTOCOMPLETE FOR REPEAT QUEUE MODE
+       ========================================================================== */
+    function initTypeaheadEvents() {
+      const input = document.getElementById('countryInput');
+      const list = document.getElementById('suggestionsList');
+
+      input.addEventListener('input', (e) => {
+        if (answered) return;
+        const query = e.target.value.trim().toLowerCase();
+        renderSuggestions(query);
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (answered) return;
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (currentSuggestions.length > 0) {
+            highlightedSuggestionIndex = (highlightedSuggestionIndex + 1) % currentSuggestions.length;
+            updateSuggestionHighlight();
+          }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (currentSuggestions.length > 0) {
+            highlightedSuggestionIndex = (highlightedSuggestionIndex - 1 + currentSuggestions.length) % currentSuggestions.length;
+            updateSuggestionHighlight();
+          }
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (highlightedSuggestionIndex >= 0 && currentSuggestions[highlightedSuggestionIndex]) {
+            selectTypedCountry(currentSuggestions[highlightedSuggestionIndex]);
+          } else if (currentSuggestions.length > 0) {
+            selectTypedCountry(currentSuggestions[0]);
+          } else {
+            // Check direct exact match
+            const typed = input.value.trim().toLowerCase();
+            const matched = COUNTRIES.find(c => c.name.toLowerCase() === typed);
+            if (matched) {
+              selectTypedCountry(matched);
+            } else if (typed.length > 0) {
+              // Custom unknown submission counted as incorrect
+              selectTypedCountry({ name: input.value.trim(), code: 'unknown', continent: '' });
+            }
+          }
+        } else if (e.key === 'Escape') {
+          list.classList.add('hidden');
+        }
+      });
+
+      // Hide suggestions when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && !list.contains(e.target)) {
+          list.classList.add('hidden');
+        }
+      });
+    }
+
+    function resetTypeInput() {
+      const input = document.getElementById('countryInput');
+      const list = document.getElementById('suggestionsList');
+      const status = document.getElementById('typeInputStatus');
+
+      input.value = '';
+      input.disabled = false;
+      input.className = "w-full bg-slate-800 border-2 border-slate-700 focus:border-amber-400 rounded-xl px-4 py-3.5 text-white placeholder-slate-500 font-medium focus:outline-none transition-all shadow-inner text-base";
+      status.classList.add('hidden');
+      status.textContent = '';
+      list.classList.add('hidden');
+      list.innerHTML = '';
+      currentSuggestions = [];
+      highlightedSuggestionIndex = -1;
+
+      setTimeout(() => input.focus(), 150);
+    }
+
+    function renderSuggestions(query) {
+      const list = document.getElementById('suggestionsList');
+      if (!query || query.length === 0) {
+        list.classList.add('hidden');
+        list.innerHTML = '';
+        currentSuggestions = [];
+        highlightedSuggestionIndex = -1;
+        return;
+      }
+
+      // Filter and prioritize countries starting with query, then containing query
+      const startsWithMatches = COUNTRIES.filter(c => c.name.toLowerCase().startsWith(query));
+      const includesMatches = COUNTRIES.filter(c => !c.name.toLowerCase().startsWith(query) && c.name.toLowerCase().includes(query));
+      currentSuggestions = [...startsWithMatches, ...includesMatches].slice(0, 7);
+
+      if (currentSuggestions.length === 0) {
+        list.innerHTML = `<div class="p-3 text-xs text-slate-400 text-center">No matching country found</div>`;
+        list.classList.remove('hidden');
+        highlightedSuggestionIndex = -1;
+        return;
+      }
+
+      highlightedSuggestionIndex = 0;
+      list.innerHTML = '';
+      currentSuggestions.forEach((country, idx) => {
+        const item = document.createElement('div');
+        item.className = `p-3 flex items-center justify-between cursor-pointer transition-colors text-sm ${idx === 0 ? 'bg-amber-500/20 text-amber-200' : 'text-slate-200 hover:bg-slate-700/60'}`;
+        item.dataset.index = idx;
+        item.innerHTML = `
+          <div class="flex items-center gap-2.5">
+            <span class="font-medium">${country.name}</span>
+          </div>
+          <span class="text-[10px] text-slate-400 uppercase tracking-wider">${country.continent}</span>
+        `;
+        item.onmousedown = (e) => {
+          e.preventDefault();
+          selectTypedCountry(country);
+        };
+        list.appendChild(item);
+      });
+      list.classList.remove('hidden');
+    }
+
+    function updateSuggestionHighlight() {
+      const list = document.getElementById('suggestionsList');
+      const items = list.querySelectorAll('div[data-index]');
+      items.forEach((item, idx) => {
+        if (idx === highlightedSuggestionIndex) {
+          item.className = 'p-3 flex items-center justify-between cursor-pointer transition-colors text-sm bg-amber-500/20 text-amber-200';
+          item.scrollIntoView({ block: 'nearest' });
+        } else {
+          item.className = 'p-3 flex items-center justify-between cursor-pointer transition-colors text-sm text-slate-200 hover:bg-slate-700/60';
+        }
+      });
+    }
+
+    function selectTypedCountry(selectedCountry) {
+      if (answered) return;
+      answered = true;
+
+      const input = document.getElementById('countryInput');
+      const list = document.getElementById('suggestionsList');
+      const status = document.getElementById('typeInputStatus');
+
+      input.disabled = true;
+      input.value = selectedCountry.name;
+      list.classList.add('hidden');
+
+      const isCorrect = (selectedCountry.code === currentCountry.code);
+      sessionHistory.push({
+        country: currentCountry,
+        selected: selectedCountry,
+        isCorrect: isCorrect
+      });
+
+      status.classList.remove('hidden');
+
+      if (isCorrect) {
+        input.className = "w-full bg-emerald-950/40 border-2 border-emerald-500 rounded-xl px-4 py-3.5 text-emerald-200 font-semibold focus:outline-none transition-all shadow-lg shadow-emerald-500/10 text-base pulse-animation";
+        status.textContent = '✅';
+        score++;
+        streak++;
+        if (streak > bestStreak) {
+          bestStreak = streak;
+          document.getElementById('bestStreakBadge').textContent = bestStreak;
+        }
+
+        // Quick confirmation (500ms), then instantly advance to next question
+        autoAdvanceTimer = setTimeout(() => {
+          nextQuestion();
+        }, 500);
+      } else {
+        input.className = "w-full bg-rose-950/40 border-2 border-rose-500 rounded-xl px-4 py-3.5 text-rose-200 font-semibold focus:outline-none transition-all shadow-lg shadow-rose-500/10 text-base";
+        status.textContent = '❌';
+        streak = 0;
+
+        // Reveal correct answer and fact
+        const factBox = document.getElementById('factBox');
+        const factText = document.getElementById('factText');
+        factText.innerHTML = `<strong>Correct Country: ${currentCountry.name}</strong><br><span class="text-slate-400 mt-1 inline-block">${currentCountry.fact}</span>`;
+        factBox.classList.remove('hidden');
+
+        document.getElementById('actionRow').classList.remove('hidden');
+      }
+
+      document.getElementById('currentScore').textContent = score;
+      document.getElementById('currentStreak').textContent = streak;
+      document.getElementById('streakBadge').textContent = streak;
     }
 
     function flagLoaded() {
