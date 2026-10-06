@@ -591,6 +591,34 @@
     let cloudFileId = null;
     let syncTimeout = null;
 
+    function setAuthButtonState(isSyncing, isSuccess, isError) {
+      const authBtn = document.getElementById('authBtn');
+      const authIcon = document.getElementById('authIcon');
+      const authText = document.getElementById('authText');
+
+      if (isSyncing) {
+        authText.textContent = 'Syncing...';
+        if (authIcon.tagName.toLowerCase() === 'svg' && authIcon.hasAttribute('viewBox')) {
+          authIcon.classList.add('animate-spin');
+        }
+      } else if (isSuccess) {
+        authText.textContent = 'Cloud Sync On';
+        authIcon.outerHTML = `<svg id="authIcon" class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+        authBtn.className = 'flex items-center gap-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all';
+      } else if (isError) {
+        authText.textContent = 'Sync Error';
+        if (authIcon.tagName.toLowerCase() !== 'svg' || !authIcon.hasAttribute('viewBox')) {
+           authIcon.outerHTML = `<span id="authIcon">⚠️</span>`;
+        } else {
+           authIcon.classList.remove('animate-spin');
+        }
+      } else {
+        if (localStorage.getItem('flagmaster_was_logged_in') === 'true') {
+          authText.textContent = 'Resume Sync';
+        }
+      }
+    }
+
     /* ==========================================================================
        COOKIE STORAGE HELPERS FOR REPEAT (TBD) QUEUE
        ========================================================================== */
@@ -722,10 +750,23 @@
         selectedContinent = e.target.value;
       });
       initTypeaheadEvents();
+
+      // Check for cached token
+      const savedToken = localStorage.getItem('flagmaster_g_token');
+      const savedExpires = parseInt(localStorage.getItem('flagmaster_g_expires') || '0', 10);
+      
+      if (savedToken && savedExpires > Date.now() + 60000) {
+        accessToken = savedToken;
+        setAuthButtonState(false, true, false); // Restores the "Cloud Sync On" UI silently
+      } else {
+        accessToken = null;
+        setAuthButtonState(false, false, false); // Checks if they were logged in to show "Resume Sync"
+      }
     });
 
     function handleAuthClick() {
       if (accessToken) {
+        setAuthButtonState(true, false, false);
         syncWithCloud();
       } else {
         if (!tokenClient && typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
@@ -735,9 +776,11 @@
             callback: (tokenResponse) => {
               if (tokenResponse && tokenResponse.access_token) {
                 accessToken = tokenResponse.access_token;
-                document.getElementById('authText').textContent = 'Syncing...';
-                const authIcon = document.getElementById('authIcon');
-                authIcon.classList.add('animate-spin');
+                const expiresAt = Date.now() + (tokenResponse.expires_in * 1000);
+                localStorage.setItem('flagmaster_g_token', accessToken);
+                localStorage.setItem('flagmaster_g_expires', expiresAt.toString());
+                localStorage.setItem('flagmaster_was_logged_in', 'true');
+                setAuthButtonState(true, false, false);
                 syncWithCloud();
               }
             },
@@ -813,22 +856,11 @@
           body: JSON.stringify(newSave)
         });
         
-        document.getElementById('authText').textContent = 'Cloud Sync On';
-        const authIcon = document.getElementById('authIcon');
-        authIcon.outerHTML = `<svg id="authIcon" class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
-        const authBtn = document.getElementById('authBtn');
-        authBtn.className = 'flex items-center gap-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all';
+        setAuthButtonState(false, true, false);
         
       } catch (err) {
         console.error('Sync failed', err);
-        document.getElementById('authText').textContent = 'Sync Error';
-        const authIcon = document.getElementById('authIcon');
-        if (authIcon.tagName.toLowerCase() !== 'svg' || !authIcon.hasAttribute('viewBox')) {
-           authIcon.outerHTML = `<span id="authIcon">⚠️</span>`;
-        } else {
-           // just clear animation if it was an svg
-           authIcon.classList.remove('animate-spin');
-        }
+        setAuthButtonState(false, false, true);
       }
     }
 
