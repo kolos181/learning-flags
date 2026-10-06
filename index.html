@@ -1,4 +1,4 @@
-﻿<!-- https://kolos181.github.io/learning-flags/ -->
+<!-- https://kolos181.github.io/learning-flags/ -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,6 +9,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Canvas Confetti CDN -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
     body {
@@ -58,9 +60,14 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Sync Cloud Action -->
+        <button id="authBtn" onclick="handleAuthClick()" class="flex items-center gap-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">
+          <span id="authIcon">☁️</span>
+          <span id="authText" class="hidden sm:inline">Sync Sign In</span>
+        </button>
         <!-- Stats Quick Badge -->
-        <div class="flex items-center gap-3 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60 text-xs">
+        <div class="hidden sm:flex items-center gap-3 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60 text-xs">
           <span class="text-slate-400">Streak: <strong id="streakBadge" class="text-amber-400 font-semibold">0</strong> 🔥</span>
           <span class="w-px h-3 bg-slate-700"></span>
           <span class="text-slate-400">Best: <strong id="bestStreakBadge" class="text-emerald-400 font-semibold">0</strong></span>
@@ -571,6 +578,14 @@
     let highlightedSuggestionIndex = -1;
     let currentSuggestions = [];
 
+    // Cloud Sync State
+    const CLIENT_ID = '597788919440-ek74d3imqgv402lkttano28pecrp3s61.apps.googleusercontent.com';
+    const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
+    let tokenClient;
+    let accessToken = null;
+    let cloudFileId = null;
+    let syncTimeout = null;
+
     /* ==========================================================================
        COOKIE STORAGE HELPERS FOR REPEAT (TBD) QUEUE
        ========================================================================== */
@@ -618,6 +633,7 @@
       const codesArray = Array.from(repeatFlagCodes);
       setCookie('flagmaster_repeat_list', JSON.stringify(codesArray));
       updateRepeatBadges();
+      if (typeof silentCloudPush === 'function') silentCloudPush();
     }
 
     function updateRepeatBadges() {
@@ -647,6 +663,7 @@
       const codesArray = Array.from(hardcoreRepeatFlagCodes);
       setCookie('flagmaster_hardcore_repeat_list', JSON.stringify(codesArray));
       updateHardcoreRepeatBadges();
+      if (typeof silentCloudPush === 'function') silentCloudPush();
     }
 
     function updateHardcoreRepeatBadges() {
@@ -692,6 +709,7 @@
        INITIALIZATION & NAVIGATION
        ========================================================================== */
     window.addEventListener('DOMContentLoaded', () => {
+      bestStreak = parseInt(getCookie('flagmaster_best_streak') || '0', 10);
       loadRepeatListFromCookie();
       loadHardcoreRepeatListFromCookie();
       document.getElementById('bestStreakBadge').textContent = bestStreak;
@@ -700,6 +718,129 @@
       });
       initTypeaheadEvents();
     });
+
+    function handleAuthClick() {
+      if (accessToken) {
+        syncWithCloud();
+      } else {
+        if (!tokenClient && typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
+          tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: CLIENT_ID,
+            scope: SCOPES,
+            callback: (tokenResponse) => {
+              if (tokenResponse && tokenResponse.access_token) {
+                accessToken = tokenResponse.access_token;
+                document.getElementById('authText').textContent = 'Syncing...';
+                const authIcon = document.getElementById('authIcon');
+                authIcon.textContent = '↻';
+                authIcon.classList.add('animate-spin');
+                syncWithCloud();
+              }
+            },
+          });
+        }
+        if (tokenClient) {
+          tokenClient.requestAccessToken();
+        } else {
+          alert("Google Sign-In is still loading. Please try again in a second.");
+        }
+      }
+    }
+
+    async function syncWithCloud() {
+      if (!accessToken) return;
+      try {
+        const res = await fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name="flagmaster_save.json"&fields=files(id)', {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        const data = await res.json();
+        
+        let cloudData = null;
+        if (data.files && data.files.length > 0) {
+          cloudFileId = data.files[0].id;
+          const contentRes = await fetch(`https://www.googleapis.com/drive/v3/files/${cloudFileId}?alt=media`, {
+            headers: { Authorization: `Bearer ${accessToken}` }
+          });
+          try { cloudData = await contentRes.json(); } catch(e) {}
+        }
+        
+        const localRepeat = Array.from(repeatFlagCodes);
+        const localHardcore = Array.from(hardcoreRepeatFlagCodes);
+        const localBest = bestStreak;
+        
+        const mergedRepeat = new Set([...localRepeat, ...(cloudData?.repeatFlags || [])]);
+        const mergedHardcore = new Set([...localHardcore, ...(cloudData?.hardcoreRepeatFlags || [])]);
+        const mergedBest = Math.max(localBest, (cloudData?.bestStreak || 0));
+        
+        repeatFlagCodes = mergedRepeat;
+        hardcoreRepeatFlagCodes = mergedHardcore;
+        bestStreak = mergedBest;
+        
+        document.getElementById('bestStreakBadge').textContent = bestStreak;
+        updateRepeatBadges();
+        updateHardcoreRepeatBadges();
+        
+        // Save merged state to local cookies
+        window.__isSyncing = true;
+        setCookie('flagmaster_best_streak', bestStreak.toString());
+        setCookie('flagmaster_repeat_list', JSON.stringify(Array.from(repeatFlagCodes)));
+        setCookie('flagmaster_hardcore_repeat_list', JSON.stringify(Array.from(hardcoreRepeatFlagCodes)));
+        window.__isSyncing = false;
+        
+        const newSave = {
+          bestStreak: mergedBest,
+          repeatFlags: Array.from(mergedRepeat),
+          hardcoreRepeatFlags: Array.from(mergedHardcore)
+        };
+        
+        if (!cloudFileId) {
+          const createRes = await fetch('https://www.googleapis.com/drive/v3/files', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: 'flagmaster_save.json', parents: ['appDataFolder'] })
+          });
+          const createData = await createRes.json();
+          cloudFileId = createData.id;
+        }
+        
+        await fetch(`https://www.googleapis.com/upload/drive/v3/files/${cloudFileId}?uploadType=media`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(newSave)
+        });
+        
+        document.getElementById('authText').textContent = 'Synced ✓';
+        const authIcon = document.getElementById('authIcon');
+        authIcon.classList.remove('animate-spin');
+        authIcon.innerHTML = `<svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+        document.getElementById('authBtn').classList.add('border-emerald-500/50', 'bg-emerald-500/10');
+        
+      } catch (err) {
+        console.error('Sync failed', err);
+        document.getElementById('authText').textContent = 'Sync Error';
+        document.getElementById('authIcon').classList.remove('animate-spin');
+        document.getElementById('authIcon').textContent = '⚠️';
+      }
+    }
+
+    function silentCloudPush() {
+      if (!accessToken || window.__isSyncing) return;
+      clearTimeout(syncTimeout);
+      syncTimeout = setTimeout(async () => {
+        const newSave = {
+          bestStreak: bestStreak,
+          repeatFlags: Array.from(repeatFlagCodes),
+          hardcoreRepeatFlags: Array.from(hardcoreRepeatFlagCodes)
+        };
+        if (cloudFileId) {
+          await fetch(`https://www.googleapis.com/upload/drive/v3/files/${cloudFileId}?uploadType=media`, {
+            method: 'PATCH',
+            headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(newSave)
+          });
+        }
+      }, 2000);
+    }
 
     function showHomeScreen() {
       clearInterval(timerInterval);
@@ -1056,6 +1197,8 @@
         if (streak > bestStreak) {
           bestStreak = streak;
           document.getElementById('bestStreakBadge').textContent = bestStreak;
+          setCookie('flagmaster_best_streak', bestStreak.toString());
+          if (typeof silentCloudPush === 'function') silentCloudPush();
         }
 
         // Quick confirmation (500ms), then instantly advance to next question
@@ -1164,6 +1307,8 @@
         if (streak > bestStreak) {
           bestStreak = streak;
           document.getElementById('bestStreakBadge').textContent = bestStreak;
+          setCookie('flagmaster_best_streak', bestStreak.toString());
+          if (typeof silentCloudPush === 'function') silentCloudPush();
         }
 
         // Quick confirmation (500ms), then instantly advance to next question
