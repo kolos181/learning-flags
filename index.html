@@ -120,6 +120,21 @@
           <span class="mt-4 text-xs font-semibold text-amber-400 flex items-center gap-1">Start Repeat Typing &rarr;</span>
         </button>
 
+        <!-- Hardcore Repeat Mode -->
+        <button id="hardcoreRepeatModeCard" onclick="startGame('hardcore_repeat')" class="group p-4 rounded-2xl bg-slate-800/70 hover:bg-slate-800 border border-rose-500/40 hover:border-rose-400 transition-all text-left flex flex-col justify-between shadow-lg hover:shadow-rose-500/10">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition-transform">
+              🔥
+            </div>
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-white text-base">Hardcore Repeats</h3>
+              <span id="hardcoreRepeatCardBadge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">0 Flags</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Failed repeat flags. Type country names to master your hardest flags.</p>
+          </div>
+          <span class="mt-4 text-xs font-semibold text-rose-400 flex items-center gap-1">Start Hardcore &rarr;</span>
+        </button>
+
         <!-- Standard Mode -->
         <button onclick="startGame('classic')" class="group p-4 rounded-2xl bg-slate-800/70 hover:bg-slate-800 border border-slate-700/70 hover:border-indigo-500/60 transition-all text-left flex flex-col justify-between shadow-lg hover:shadow-indigo-500/10">
           <div>
@@ -552,6 +567,7 @@
     let autoAdvanceTimer = null;
     let timeRemaining = 60;
     let repeatFlagCodes = new Set();
+    let hardcoreRepeatFlagCodes = new Set();
     let highlightedSuggestionIndex = -1;
     let currentSuggestions = [];
 
@@ -612,6 +628,33 @@
       if (cardBadge) cardBadge.textContent = `${count} Flag${count === 1 ? '' : 's'}`;
     }
 
+    function loadHardcoreRepeatListFromCookie() {
+      const raw = getCookie('flagmaster_hardcore_repeat_list');
+      if (raw) {
+        try {
+          const codes = JSON.parse(raw);
+          if (Array.isArray(codes)) {
+            hardcoreRepeatFlagCodes = new Set(codes);
+          }
+        } catch (e) {
+          hardcoreRepeatFlagCodes = new Set(raw.split(',').filter(Boolean));
+        }
+      }
+      updateHardcoreRepeatBadges();
+    }
+
+    function saveHardcoreRepeatListToCookie() {
+      const codesArray = Array.from(hardcoreRepeatFlagCodes);
+      setCookie('flagmaster_hardcore_repeat_list', JSON.stringify(codesArray));
+      updateHardcoreRepeatBadges();
+    }
+
+    function updateHardcoreRepeatBadges() {
+      const count = hardcoreRepeatFlagCodes.size;
+      const cardBadge = document.getElementById('hardcoreRepeatCardBadge');
+      if (cardBadge) cardBadge.textContent = `${count} Flag${count === 1 ? '' : 's'}`;
+    }
+
     function toggleCurrentFlagRepeat() {
       if (!currentCountry) return;
       toggleFlagRepeat(currentCountry.code);
@@ -650,6 +693,7 @@
        ========================================================================== */
     window.addEventListener('DOMContentLoaded', () => {
       loadRepeatListFromCookie();
+      loadHardcoreRepeatListFromCookie();
       document.getElementById('bestStreakBadge').textContent = bestStreak;
       document.getElementById('continentFilter').addEventListener('change', (e) => {
         selectedContinent = e.target.value;
@@ -661,6 +705,7 @@
       clearInterval(timerInterval);
       clearTimeout(autoAdvanceTimer);
       updateRepeatBadges();
+      updateHardcoreRepeatBadges();
       document.getElementById('startScreen').classList.remove('hidden');
       document.getElementById('quizScreen').classList.add('hidden');
       document.getElementById('resultScreen').classList.add('hidden');
@@ -680,6 +725,16 @@
           }
           return;
         }
+      } else if (mode === 'hardcore_repeat') {
+        const markedCountries = COUNTRIES.filter(c => hardcoreRepeatFlagCodes.has(c.code));
+        if (markedCountries.length === 0) {
+          const card = document.getElementById('hardcoreRepeatModeCard');
+          if (card) {
+            card.classList.add('ring-2', 'ring-rose-400');
+            setTimeout(() => card.classList.remove('ring-2', 'ring-rose-400'), 800);
+          }
+          return;
+        }
       }
 
       currentMode = mode;
@@ -693,6 +748,8 @@
       if (currentMode === 'repeat') {
         // Pool exclusively contains the marked repeat flags
         questionPool = shuffleArray(COUNTRIES.filter(c => repeatFlagCodes.has(c.code)));
+      } else if (currentMode === 'hardcore_repeat') {
+        questionPool = shuffleArray(COUNTRIES.filter(c => hardcoreRepeatFlagCodes.has(c.code)));
       } else {
         // Filter available countries based on continent selection
         let pool = COUNTRIES;
@@ -772,7 +829,7 @@
       if (currentMode === 'classic') {
         totalDisplay = '15';
         progressPct = ((currentQuestionIndex) / 15) * 100;
-      } else if (currentMode === 'all' || currentMode === 'repeat') {
+      } else if (currentMode === 'all' || currentMode === 'repeat' || currentMode === 'hardcore_repeat') {
         totalDisplay = questionPool.length;
         progressPct = ((currentQuestionIndex) / questionPool.length) * 100;
       }
@@ -794,7 +851,7 @@
       const choicesGrid = document.getElementById('choicesGrid');
       const typeInContainer = document.getElementById('typeInContainer');
 
-      if (currentMode === 'repeat') {
+      if (currentMode === 'repeat' || currentMode === 'hardcore_repeat') {
         // Hide 4-choice buttons and enable typing input
         choicesGrid.classList.add('hidden');
         typeInContainer.classList.remove('hidden');
@@ -862,6 +919,7 @@
           }
         } else if (e.key === 'Enter') {
           e.preventDefault();
+          e.stopPropagation();
           if (highlightedSuggestionIndex >= 0 && currentSuggestions[highlightedSuggestionIndex]) {
             selectTypedCountry(currentSuggestions[highlightedSuggestionIndex]);
           } else if (currentSuggestions.length > 0) {
@@ -986,6 +1044,11 @@
       status.classList.remove('hidden');
 
       if (isCorrect) {
+        if (currentMode === 'hardcore_repeat') {
+          hardcoreRepeatFlagCodes.delete(currentCountry.code);
+          saveHardcoreRepeatListToCookie();
+        }
+
         input.className = "w-full bg-emerald-950/40 border-2 border-emerald-500 rounded-xl px-4 py-3.5 text-emerald-200 font-semibold focus:outline-none transition-all shadow-lg shadow-emerald-500/10 text-base pulse-animation";
         status.textContent = '✅';
         score++;
@@ -1000,6 +1063,11 @@
           nextQuestion();
         }, 500);
       } else {
+        if (currentMode === 'repeat' || currentMode === 'hardcore_repeat') {
+          hardcoreRepeatFlagCodes.add(currentCountry.code);
+          saveHardcoreRepeatListToCookie();
+        }
+
         input.className = "w-full bg-rose-950/40 border-2 border-rose-500 rounded-xl px-4 py-3.5 text-rose-200 font-semibold focus:outline-none transition-all shadow-lg shadow-rose-500/10 text-base";
         status.textContent = '❌';
         streak = 0;
@@ -1224,6 +1292,20 @@
         });
       }
     }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const actionRow = document.getElementById('actionRow');
+        const resultScreen = document.getElementById('resultScreen');
+        // Prevent if we are on the result screen
+        if (resultScreen && !resultScreen.classList.contains('hidden')) return;
+
+        if (actionRow && !actionRow.classList.contains('hidden')) {
+          e.preventDefault();
+          nextQuestion();
+        }
+      }
+    });
   </script>
 </body>
 </html>
